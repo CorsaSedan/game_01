@@ -84,7 +84,9 @@ public class Game extends Canvas implements Runnable, KeyListener {
     //Update
     private void tick() {
         //TODO code here
-        entities.forEach((Entity e) -> e.tick());
+        for (Entity entity : entities) {
+            entity.tick();
+        }
     }
 
     //Render
@@ -151,30 +153,22 @@ public class Game extends Canvas implements Runnable, KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_D:
-                System.out.println("Foi");
                 player.setRight(true);
-                player.setLeft(false);
-                player.setUp(false);
-                player.setDown(false);
                 break;
             case KeyEvent.VK_A:
-                player.setRight(false);
                 player.setLeft(true);
-                player.setUp(false);
-                player.setDown(false);
                 break;
             case KeyEvent.VK_W:
-                player.setRight(false);
-                player.setLeft(false);
                 player.setUp(true);
-                player.setDown(false);
                 break;
             case KeyEvent.VK_S:
-                player.setRight(false);
-                player.setLeft(false);
-                player.setUp(false);
                 player.setDown(true);
                 break;
             default:
@@ -183,13 +177,23 @@ public class Game extends Canvas implements Runnable, KeyListener {
     }
 
     @Override
-    public void keyPressed(KeyEvent e) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public void keyReleased(KeyEvent e) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_D:
+                player.setRight(false);
+                break;
+            case KeyEvent.VK_A:
+                player.setLeft(false);
+                break;
+            case KeyEvent.VK_W:
+                player.setUp(false);
+                break;
+            case KeyEvent.VK_S:
+                player.setDown(false);
+                break;
+            default:
+                break;
+        }
     }
 
 }

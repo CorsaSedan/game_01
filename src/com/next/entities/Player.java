@@ -18,11 +18,11 @@ public class Player extends Entity {
     private boolean up;
     private boolean down;
 
-    private int speed;
+    protected int speed;
 
     public Player(int x, int y, int width, int height, BufferedImage sprite) {
         super(x, y, width, height, sprite);
-        this.speed = 4;
+        this.speed = 1;
     }
 
     public void setRight(boolean right) {
@@ -48,13 +48,13 @@ public class Player extends Entity {
     @Override
     public void tick() {
         if (right) {
-            super.setX(super.getX() + 4);
+            super.setX(super.getX() + speed);
         } else if (left) {
-            super.setX(super.getX() - 4);
+            super.setX(super.getX() - speed);
         } else if (up) {
-            super.setY(super.getY() + 4);
+            super.setY(super.getY() - speed);
         } else if (down) {
-            super.setY(super.getY() - 4);
+            super.setY(super.getY() + speed);
         }
     }
 
