@@ -1,36 +1,58 @@
-
 package com.next.main;
 
+import com.next.entities.Entity;
+import com.next.entities.Player;
+import com.next.graficos.Spritesheet;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 
+public class Game extends Canvas implements Runnable, KeyListener {
 
-public class Game extends Canvas implements Runnable{
-    
     private Thread thread;
     private boolean isRunning;
 
     private static JFrame frame;
-    private final String NAME = "Game Project";
+    private final String name = "Game Project";
     private final int WIDTH = 160;
     private final int HEIGHT = 120;
     private final int SCALE = 4;
 
     private BufferedImage image;
+    private Spritesheet spritesheet;
+
+    private List<Entity> entities;
+    private Player player;
 
     public Game() {
+        addKeyListener(this);
         super.setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
         image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
         initFrame();
+
+        entities = new ArrayList();
+        try {
+            spritesheet = new Spritesheet("/spritesheet.png");
+            player = new Player(0, 0, 16, 16, spritesheet.getSprite(32, 0, 16, 16));
+            entities.add(player);
+        } catch (IOException ex) {
+            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-    
+
     public void initFrame() {
-        frame = new JFrame(NAME);
+        frame = new JFrame(name);
         frame.add(this);
         frame.setResizable(false);
         frame.pack();
@@ -38,33 +60,33 @@ public class Game extends Canvas implements Runnable{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
-    
+
     //Game methods
     //
-    
     //Start
     public synchronized void start() {
         isRunning = true;
-        
+
         thread = new Thread(this);
         thread.start();
     }
-    
+
     //Stop
     public synchronized void stop() {
         isRunning = false;
         try {
             thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     //Update
     private void tick() {
-        //System.out.println("Atualizando!");
+        //TODO code here
+        entities.forEach((Entity e) -> e.tick());
     }
-    
+
     //Render
     public void render() {
 
@@ -75,8 +97,12 @@ public class Game extends Canvas implements Runnable{
         }
 
         Graphics g = image.getGraphics();
-        g.setColor(Color.BLACK);
+        g.setColor(Color.WHITE);
         g.fillRect(0, 0, WIDTH, HEIGHT);
+
+        for (Entity entity : entities) {
+            entity.render(g);
+        }
 
         g.dispose();
         g = bs.getDrawGraphics();
@@ -91,36 +117,79 @@ public class Game extends Canvas implements Runnable{
         double amountOfTicks = 60.0;
         double ns = 1000000000 / amountOfTicks;
         double delta = 0;
-        
+
         //Debug info *(frame rate)*
         int frames = 0;
         double timer = System.currentTimeMillis();
-        
+
         while (isRunning) {
             long now = System.nanoTime();
             delta += (now - lastTime) / ns;
             lastTime = now;
-            
+
             if (delta >= 1) {
                 this.tick();
                 this.render();
                 frames++;       //Debug info *(frame rate)*
                 delta--;
             }
-            
+
             //Debug info *(frame rate)*
-            if(System.currentTimeMillis() - timer >= 1000) {
+            if (System.currentTimeMillis() - timer >= 1000) {
                 System.out.println("FPS: " + frames);
                 frames = 0;
                 timer = System.currentTimeMillis();
             }
         }
-        
+
         stop();
     }
-    
+
     public static void main(String[] args) {
         new Game().start();
     }
-    
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_D:
+                System.out.println("Foi");
+                player.setRight(true);
+                player.setLeft(false);
+                player.setUp(false);
+                player.setDown(false);
+                break;
+            case KeyEvent.VK_A:
+                player.setRight(false);
+                player.setLeft(true);
+                player.setUp(false);
+                player.setDown(false);
+                break;
+            case KeyEvent.VK_W:
+                player.setRight(false);
+                player.setLeft(false);
+                player.setUp(true);
+                player.setDown(false);
+                break;
+            case KeyEvent.VK_S:
+                player.setRight(false);
+                player.setLeft(false);
+                player.setUp(false);
+                player.setDown(true);
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }
