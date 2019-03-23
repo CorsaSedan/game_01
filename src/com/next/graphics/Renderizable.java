@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.next.view;
+package com.next.graphics;
 
 import java.awt.Graphics;
 
@@ -14,4 +14,5 @@ import java.awt.Graphics;
 public interface Renderizable {
     
     public void render(Graphics g);
+    
 }

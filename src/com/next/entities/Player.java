@@ -7,6 +7,7 @@ package com.next.entities;
 
 import com.next.configs.KeyboardConfig;
 import com.next.main.Game;
+import com.next.view.Camera;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -102,29 +103,32 @@ public class Player extends Entity implements KeyListener {
             moved = true;
             super.setY(super.getY() + speed);
         }
-        
+
         if (moved) {
             frames++;
-            if(frames == maxFrames) {
+            if (frames == maxFrames) {
                 frames = 0;
                 index++;
-                if(index > maxIndex) {
+                if (index > maxIndex) {
                     index = 0;
                 }
             }
         }
+
+        Camera.setX(this.getX() - (Game.WIDTH / 2));
+        Camera.setY(this.getY() - (Game.HEIGHT / 2));
     }
 
     @Override
     public void render(Graphics g) {
         if (up) {
-            g.drawImage(upPlayer[index], (int) getX(), (int) getY(), null);
+            g.drawImage(upPlayer[index], (int) getX() - Camera.getX(), (int) getY() - Camera.getY(), null);
         } else if (down) {
-            g.drawImage(downPlayer[index], (int) getX(), (int) getY(), null);
+            g.drawImage(downPlayer[index], (int) getX() - Camera.getX(), (int) getY() - Camera.getY(), null);
         } else if (right) {
-            g.drawImage(rightPlayer[index], (int) getX(), (int) getY(), null);
+            g.drawImage(rightPlayer[index], (int) getX() - Camera.getX(), (int) getY() - Camera.getY(), null);
         } else if (left) {
-            g.drawImage(leftPlayer[index], (int) getX(), (int) getY(), null);
+            g.drawImage(leftPlayer[index], (int) getX() - Camera.getX(), (int) getY() - Camera.getY(), null);
         } else {
             super.render(g);
         }

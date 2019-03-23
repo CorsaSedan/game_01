@@ -6,7 +6,7 @@ import java.awt.event.KeyEvent;
  * 
  * @author cristhian.anacleto
  */
-public abstract class KeyboardConfig {
+public final class KeyboardConfig {
 
     public static int MOVE_UP = KeyEvent.VK_W;
     public static int MOVE_DOWN = KeyEvent.VK_S;
@@ -28,5 +28,10 @@ public abstract class KeyboardConfig {
     public static void setMOVE_RIGHT(int MOVE_RIGHT) {
         KeyboardConfig.MOVE_RIGHT = MOVE_RIGHT;
     }
+
+    private KeyboardConfig() {
+    }
+    
+    
 
 }

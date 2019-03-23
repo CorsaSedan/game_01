@@ -1,6 +1,8 @@
 package com.next.main;
 
+import com.next.entities.Enemy;
 import com.next.entities.Entity;
+import com.next.entities.Item;
 import com.next.entities.Player;
 import com.next.graphics.Spritesheet;
 import com.next.world.World;
@@ -23,40 +25,38 @@ public class Game extends Canvas implements Runnable {
     private boolean isRunning;
 
     private JFrame frame;
-    private final String name = "Game Project";
-    private final int WIDTH = 160;
-    private final int HEIGHT = 120;
-    private final int SCALE = 4;
+    public final String name = "Game Project";
+    public static int WIDTH = 240;
+    public static int HEIGHT = 160;
+    public static int SCALE = 3;
 
     private BufferedImage image;
-    
+
     public static Spritesheet spritesheet;
     public static World world;
 
-    private List<Entity> entities;
-    private Player player;
+    public static List<Entity> entities;
+    public static List<Item> items;
+    public static Player player;
 
     public Game() {
         super.setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
         initFrame();
 
+        image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+        entities = new ArrayList();
+        items = new ArrayList();
         try {
+            spritesheet = new Spritesheet("/spritesheet.png");
+
+            player = new Player(0, 0, 16, 16, spritesheet.getSprite(32, 0, 16, 16));
+            addKeyListener(player);
+            entities.add(player);
+
             world = new World("/map.png");
         } catch (IOException ex) {
             Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-        entities = new ArrayList();
-        try {
-            spritesheet = new Spritesheet("/spritesheet.png");
-            player = new Player(0, 0, 16, 16, spritesheet.getSprite(32, 0, 16, 16));
-            entities.add(player);
-            addKeyListener(player);
-        } catch (IOException ex) {
-            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
     }
 
     public void initFrame() {
@@ -107,11 +107,15 @@ public class Game extends Canvas implements Runnable {
         }
 
         Graphics g = image.getGraphics();
-        g.setColor(Color.WHITE);
+        g.setColor(Color.BLACK);
         g.fillRect(0, 0, WIDTH, HEIGHT);
 
+        world.render(g);
         for (Entity entity : entities) {
             entity.render(g);
+        }
+        for (Item item : items) {
+            item.render(g);
         }
 
         g.dispose();

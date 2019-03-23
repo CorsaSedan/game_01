@@ -5,65 +5,22 @@
  */
 package com.next.entities;
 
-import java.awt.Graphics;
+import com.next.graphics.Renderizable;
+import com.next.main.Game;
+import com.next.view.Camera;
 import java.awt.image.BufferedImage;
 
 /**
  *
  * @author cristhian.anacleto
  */
-public abstract class Entity {
-
-    private double x;
-    private double y;
-    private int width;
-    private int height;
-
-    private BufferedImage sprite;
+public abstract class Entity extends PrimitiveEntity implements Renderizable {
+    
+    public static BufferedImage ENEMY = Game.spritesheet.getSprite(6 * 16, 16, 16, 16);
 
     public Entity(int x, int y, int width, int height, BufferedImage sprite) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.sprite = sprite;
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public void setY(double y) {
-        this.y = y;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
+        super(x - Camera.getX(), y - Camera.getY(), width, height, sprite);
     }
 
     public abstract void tick();
-
-    public void render(Graphics g) {
-        g.drawImage(sprite, (int) x, (int) y, null);
-    }
 }
