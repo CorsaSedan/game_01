@@ -14,11 +14,11 @@ import java.awt.image.BufferedImage;
  */
 public abstract class Entity {
 
-    private int x;
-    private int y;
+    private double x;
+    private double y;
     private int width;
     private int height;
-    
+
     private BufferedImage sprite;
 
     public Entity(int x, int y, int width, int height, BufferedImage sprite) {
@@ -29,19 +29,19 @@ public abstract class Entity {
         this.sprite = sprite;
     }
 
-    public int getX() {
+    public double getX() {
         return x;
     }
 
-    public void setX(int x) {
+    public void setX(double x) {
         this.x = x;
     }
 
-    public int getY() {
+    public double getY() {
         return y;
     }
 
-    public void setY(int y) {
+    public void setY(double y) {
         this.y = y;
     }
 
@@ -60,10 +60,10 @@ public abstract class Entity {
     public void setHeight(int height) {
         this.height = height;
     }
-    
+
     public abstract void tick();
-    
+
     public void render(Graphics g) {
-        g.drawImage(sprite, x, y, null);
+        g.drawImage(sprite, (int) x, (int) y, null);
     }
 }

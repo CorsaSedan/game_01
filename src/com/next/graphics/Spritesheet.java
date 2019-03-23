@@ -1,5 +1,5 @@
 
-package com.next.graficos;
+package com.next.graphics;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;

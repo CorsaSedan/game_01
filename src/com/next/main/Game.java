@@ -2,13 +2,12 @@ package com.next.main;
 
 import com.next.entities.Entity;
 import com.next.entities.Player;
-import com.next.graficos.Spritesheet;
+import com.next.graphics.Spritesheet;
+import com.next.world.World;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -18,37 +17,46 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 
-public class Game extends Canvas implements Runnable, KeyListener {
+public class Game extends Canvas implements Runnable {
 
     private Thread thread;
     private boolean isRunning;
 
-    private static JFrame frame;
+    private JFrame frame;
     private final String name = "Game Project";
     private final int WIDTH = 160;
     private final int HEIGHT = 120;
     private final int SCALE = 4;
 
     private BufferedImage image;
-    private Spritesheet spritesheet;
+    
+    public static Spritesheet spritesheet;
+    public static World world;
 
     private List<Entity> entities;
     private Player player;
 
     public Game() {
-        addKeyListener(this);
         super.setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
-        image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
         initFrame();
 
+        try {
+            world = new World("/map.png");
+        } catch (IOException ex) {
+            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
         entities = new ArrayList();
         try {
             spritesheet = new Spritesheet("/spritesheet.png");
             player = new Player(0, 0, 16, 16, spritesheet.getSprite(32, 0, 16, 16));
             entities.add(player);
+            addKeyListener(player);
         } catch (IOException ex) {
             Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
     }
 
     public void initFrame() {
@@ -149,51 +157,6 @@ public class Game extends Canvas implements Runnable, KeyListener {
 
     public static void main(String[] args) {
         new Game().start();
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-        switch (e.getKeyCode()) {
-            case KeyEvent.VK_D:
-                player.setRight(true);
-                break;
-            case KeyEvent.VK_A:
-                player.setLeft(true);
-                break;
-            case KeyEvent.VK_W:
-                player.setUp(true);
-                break;
-            case KeyEvent.VK_S:
-                player.setDown(true);
-                break;
-            default:
-                break;
-        }
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-        switch (e.getKeyCode()) {
-            case KeyEvent.VK_D:
-                player.setRight(false);
-                break;
-            case KeyEvent.VK_A:
-                player.setLeft(false);
-                break;
-            case KeyEvent.VK_W:
-                player.setUp(false);
-                break;
-            case KeyEvent.VK_S:
-                player.setDown(false);
-                break;
-            default:
-                break;
-        }
     }
 
 }
