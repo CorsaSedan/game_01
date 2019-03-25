@@ -1,7 +1,9 @@
-
 package com.next.view;
 
-
+/**
+ * 
+ * @author cristhian.anacleto
+ */
 public class Camera {
 
     private static int x;
@@ -21,5 +23,16 @@ public class Camera {
 
     public static void setY(int aY) {
         y = aY;
+    }
+
+    public static int clamp(int actual, int min, int max) {
+        if (actual < min) {
+            actual = min;
+        }
+        if (actual > max) {
+            actual = max;
+        }
+
+        return actual;
     }
 }

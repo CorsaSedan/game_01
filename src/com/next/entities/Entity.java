@@ -5,7 +5,6 @@
  */
 package com.next.entities;
 
-import com.next.graphics.Renderizable;
 import com.next.main.Game;
 import com.next.view.Camera;
 import java.awt.image.BufferedImage;
@@ -14,7 +13,7 @@ import java.awt.image.BufferedImage;
  *
  * @author cristhian.anacleto
  */
-public abstract class Entity extends PrimitiveEntity implements Renderizable {
+public abstract class Entity extends PrimitiveEntity{
     
     public static BufferedImage ENEMY = Game.spritesheet.getSprite(6 * 16, 16, 16, 16);
 

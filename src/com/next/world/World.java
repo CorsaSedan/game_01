@@ -4,22 +4,25 @@ import com.next.configs.TileMap;
 import com.next.entities.Enemy;
 import com.next.entities.Entity;
 import com.next.entities.Item;
-import com.next.graphics.Renderizable;
 import com.next.main.Game;
+import com.next.view.Camera;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 /**
  *
  * @author cristhian.anacleto
  */
-public class World implements Renderizable {
+public class World {
 
-    private static int WIDHT;
-    private static int HEIGHT;
-    private Tile[] tiles;
+    public static int WIDHT;
+    public static int HEIGHT;
+    public static Tile[] tiles;
+    public static final int TILE_SIZE = 16;
 
     public World(String path) throws IOException {
         BufferedImage map = ImageIO.read(getClass().getResource(path));
@@ -48,7 +51,9 @@ public class World implements Renderizable {
                         tiles[xx + (yy * WIDHT)] = new TileFloor(TileMap.TILE_FLOR, xx * 16, yy * 16);
                         break;
                     case 0xffff0000: //Enemy
-                        Game.entities.add(new Enemy(xx * 16, yy * 16, WIDHT, HEIGHT, Entity.ENEMY));
+                        Enemy en = new Enemy(xx * 16, yy * 16, WIDHT, HEIGHT, Entity.ENEMY);
+                        Game.entities.add(en);
+                        Game.enemies.add(en);
                         tiles[xx + (yy * WIDHT)] = new TileFloor(TileMap.TILE_FLOR, xx * 16, yy * 16);
                         break;
                     case 0xff00ff00: //Life
@@ -63,14 +68,47 @@ public class World implements Renderizable {
         }
     }
 
-    @Override
     public void render(Graphics g) {
-        for (int xx = 0; xx < WIDHT; xx++) {
-            for (int yy = 0; yy < HEIGHT; yy++) {
+        int xstart = Camera.getX() >> 4;    // Dividido por 16
+        int ystart = Camera.getY() >> 4;    // Dividido por 16
+
+        int xfinal = xstart + (Game.WIDTH >> 4);    //Dividido por 16
+        int yfinal = ystart + (Game.HEIGHT >> 4);   //Dividido por 16
+
+        for (int xx = xstart; xx <= xfinal; xx++) {
+            for (int yy = ystart; yy <= yfinal; yy++) {
+                if (xx < 0 || yy < 0 || xx >= WIDHT || yy >= HEIGHT) {
+                    continue;
+                }
                 Tile tile = tiles[xx + (yy * WIDHT)];
                 tile.render(g);
             }
         }
+    }
+
+    public static boolean isFree(int xNext, int yNext) {
+        int x1 = xNext / TILE_SIZE;
+        int y1 = yNext / TILE_SIZE;
+
+        int x2 = (xNext + TILE_SIZE - 1) / TILE_SIZE;
+        int y2 = yNext / TILE_SIZE;
+
+        int x3 = xNext / TILE_SIZE;
+        int y3 = (yNext + TILE_SIZE - 1) / TILE_SIZE;
+
+        int x4 = (xNext + TILE_SIZE - 1) / TILE_SIZE;
+        int y4 = (yNext + TILE_SIZE - 1) / TILE_SIZE;
+
+        try {
+            return !(tiles[x1 + (y1 * World.WIDHT)] instanceof TileWall
+                || tiles[x2 + (y2 * World.WIDHT)] instanceof TileWall
+                || tiles[x3 + (y3 * World.WIDHT)] instanceof TileWall
+                || tiles[x4 + (y4 * World.WIDHT)] instanceof TileWall);
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+        
     }
 
 }

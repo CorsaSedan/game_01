@@ -15,6 +15,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -34,8 +35,11 @@ public class Game extends Canvas implements Runnable {
 
     public static Spritesheet spritesheet;
     public static World world;
+    
+    public static Random random;
 
     public static List<Entity> entities;
+    public static List<Enemy> enemies;
     public static List<Item> items;
     public static Player player;
 
@@ -43,8 +47,11 @@ public class Game extends Canvas implements Runnable {
         super.setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
         initFrame();
 
+        random = new Random();
+        
         image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
         entities = new ArrayList();
+        enemies = new ArrayList();
         items = new ArrayList();
         try {
             spritesheet = new Spritesheet("/spritesheet.png");
@@ -67,6 +74,7 @@ public class Game extends Canvas implements Runnable {
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
+        requestFocus();
     }
 
     //Game methods

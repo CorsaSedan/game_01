@@ -8,6 +8,7 @@ package com.next.entities;
 import com.next.configs.KeyboardConfig;
 import com.next.main.Game;
 import com.next.view.Camera;
+import com.next.world.World;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -24,7 +25,7 @@ public class Player extends Entity implements KeyListener {
     private boolean up;
     private boolean down;
 
-    protected double speed;
+    protected int speed;
     protected boolean moved;
 
     protected int frames;
@@ -39,7 +40,7 @@ public class Player extends Entity implements KeyListener {
 
     public Player(int x, int y, int width, int height, BufferedImage sprite) {
         super(x, y, width, height, sprite);
-        this.speed = 1;
+        this.speed = 2;
         this.moved = false;
 
         this.maxFrames = 15;
@@ -83,23 +84,23 @@ public class Player extends Entity implements KeyListener {
         this.down = down;
     }
 
-    public void setSpeed(double speed) {
+    public void setSpeed(int speed) {
         this.speed = speed;
     }
 
     @Override
     public void tick() {
         moved = false;
-        if (right) {
+        if (right && World.isFree(getX() + speed, getY())) {
             moved = true;
             super.setX(super.getX() + speed);
-        } else if (left) {
+        } else if (left && World.isFree(getX() - speed, getY())) {
             moved = true;
             super.setX(super.getX() - speed);
-        } else if (up) {
+        } else if (up && World.isFree(getX(), getY() - speed)) {
             moved = true;
             super.setY(super.getY() - speed);
-        } else if (down) {
+        } else if (down && World.isFree(getX(), getY() + speed)) {
             moved = true;
             super.setY(super.getY() + speed);
         }
@@ -115,20 +116,20 @@ public class Player extends Entity implements KeyListener {
             }
         }
 
-        Camera.setX(this.getX() - (Game.WIDTH / 2));
-        Camera.setY(this.getY() - (Game.HEIGHT / 2));
+        Camera.setX(Camera.clamp(this.getX() - (Game.WIDTH / 2), 0, World.WIDHT * 16 - Game.WIDTH));
+        Camera.setY(Camera.clamp(this.getY() - (Game.HEIGHT / 2), 0, World.HEIGHT * 16 - Game.HEIGHT));
     }
 
     @Override
     public void render(Graphics g) {
         if (up) {
-            g.drawImage(upPlayer[index], (int) getX() - Camera.getX(), (int) getY() - Camera.getY(), null);
+            g.drawImage(upPlayer[index], getX() - Camera.getX(), getY() - Camera.getY(), null);
         } else if (down) {
-            g.drawImage(downPlayer[index], (int) getX() - Camera.getX(), (int) getY() - Camera.getY(), null);
+            g.drawImage(downPlayer[index], getX() - Camera.getX(), getY() - Camera.getY(), null);
         } else if (right) {
-            g.drawImage(rightPlayer[index], (int) getX() - Camera.getX(), (int) getY() - Camera.getY(), null);
+            g.drawImage(rightPlayer[index], getX() - Camera.getX(), getY() - Camera.getY(), null);
         } else if (left) {
-            g.drawImage(leftPlayer[index], (int) getX() - Camera.getX(), (int) getY() - Camera.getY(), null);
+            g.drawImage(leftPlayer[index], getX() - Camera.getX(), getY() - Camera.getY(), null);
         } else {
             super.render(g);
         }

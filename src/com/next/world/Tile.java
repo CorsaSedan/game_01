@@ -1,7 +1,6 @@
 
 package com.next.world;
 
-import com.next.graphics.Renderizable;
 import com.next.main.Game;
 import com.next.view.Camera;
 import java.awt.Graphics;
@@ -11,7 +10,7 @@ import java.awt.image.BufferedImage;
  * 
  * @author cristhian.anacleto
  */
-public abstract class Tile implements Renderizable{
+public abstract class Tile{
 
     private BufferedImage sprite;
     private int x;
@@ -24,7 +23,6 @@ public abstract class Tile implements Renderizable{
     }    
     
     
-    @Override
     public void render(Graphics g) {
         g.drawImage(sprite, x - Camera.getX(), y - Camera.getY(), null);
     }

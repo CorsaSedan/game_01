@@ -1,7 +1,6 @@
 
 package com.next.entities;
 
-import com.next.graphics.Renderizable;
 import com.next.view.Camera;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -10,10 +9,10 @@ import java.awt.image.BufferedImage;
  * 
  * @author cristhian.anacleto
  */
-public abstract class PrimitiveEntity implements Renderizable{
+public abstract class PrimitiveEntity{
     
-    private double x;
-    private double y;
+    private int x;
+    private int y;
     private int width;
     private int height;
 
@@ -31,7 +30,7 @@ public abstract class PrimitiveEntity implements Renderizable{
         return (int)x;
     }
 
-    public void setX(double x) {
+    public void setX(int x) {
         this.x = x;
     }
 
@@ -39,7 +38,7 @@ public abstract class PrimitiveEntity implements Renderizable{
         return (int)y;
     }
 
-    public void setY(double y) {
+    public void setY(int y) {
         this.y = y;
     }
 
@@ -59,7 +58,6 @@ public abstract class PrimitiveEntity implements Renderizable{
         this.height = height;
     }
 
-    @Override
     public void render(Graphics g) {
         g.drawImage(sprite, this.getX() - Camera.getX(), this.getY() - Camera.getY(), null);
     }
