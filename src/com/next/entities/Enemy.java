@@ -21,6 +21,13 @@ public class Enemy extends Entity {
     private int maskWidth;
     private int maskHeight;
 
+    private int frames = 0;
+    private int maxFrames = 10;
+    private int index = 0;
+    private int maxIndex = 1;
+
+    private BufferedImage[] sprites;
+
     public Enemy(int x, int y, int width, int height, BufferedImage sprite) {
         super(x, y, width, height, sprite);
 
@@ -28,26 +35,57 @@ public class Enemy extends Entity {
         maskY = 0;
         maskWidth = 11;
         maskHeight = 16;
+
+        sprites = new BufferedImage[2];
+
+        sprites[0] = Game.spritesheet.getSprite(96, 16, 16, 16);
+        sprites[1] = Game.spritesheet.getSprite(112, 16, 16, 16);
     }
 
     @Override
     public void tick() {
 
-        if (this.getX() < Game.player.getX() && World.isFree(this.getX() + speed, this.getY())
-                && !isColliding(this.getX() + speed, this.getY())) {
-            this.setX(getX() + speed);
-        } else if (this.getX() > Game.player.getX() && World.isFree(this.getX() - speed, this.getY())
-                && !isColliding(this.getX() - speed, this.getY())) {
-            this.setX(getX() - speed);
+        if (!this.isCollidingWithPlayer()) {
+            if (this.getX() < Game.player.getX() && World.isFree(this.getX() + speed, this.getY())
+                    && !isColliding(this.getX() + speed, this.getY())) {
+                this.setX(getX() + speed);
+            } else if (this.getX() > Game.player.getX() && World.isFree(this.getX() - speed, this.getY())
+                    && !isColliding(this.getX() - speed, this.getY())) {
+                this.setX(getX() - speed);
+            }
+
+            if (this.getY() < Game.player.getY() && World.isFree(this.getX(), this.getY() + speed)
+                    && !isColliding(this.getX(), this.getY() + speed)) {
+                this.setY(getY() + speed);
+            } else if (this.getY() > Game.player.getY() && World.isFree(this.getX(), this.getY() - speed)
+                    && !isColliding(this.getX(), this.getY() - speed)) {
+                this.setY(getY() - speed);
+            }
+        } else {
+            if (Game.random.nextInt(100) < 10) {
+                Game.player.dealDamage(1);
+            }
+            
+            if (Game.player.isDead()) {
+                //System.exit(0);
+            }
         }
 
-        if (this.getY() < Game.player.getY() && World.isFree(this.getX(), this.getY() + speed)
-                && !isColliding(this.getX(), this.getY() + speed)) {
-            this.setY(getY() + speed);
-        } else if (this.getY() > Game.player.getY() && World.isFree(this.getX(), this.getY() - speed)
-                && !isColliding(this.getX(), this.getY() - speed)) {
-            this.setY(getY() - speed);
+        frames++;
+        if (frames == maxFrames) {
+            frames = 0;
+            index++;
+            if (index > maxIndex) {
+                index = 0;
+            }
         }
+    }
+
+    public boolean isCollidingWithPlayer() {
+        Rectangle curr = new Rectangle(this.getX() + maskX, this.getY() + maskY, maskWidth, maskHeight);
+        Rectangle player = new Rectangle(Game.player.getX(), Game.player.getY(), 16, 16);
+
+        return curr.intersects(player);
     }
 
     public boolean isColliding(int xnext, int ynext) {
@@ -68,7 +106,9 @@ public class Enemy extends Entity {
 
     @Override
     public void render(Graphics g) {
-        super.render(g); //To change body of generated methods, choose Tools | Templates.
+        //super.render(g);
+        g.drawImage(sprites[index], getX() - Camera.getX(), getY() - Camera.getY(), null);
+
         //g.setColor(Color.BLUE);
         //g.fillRect(this.getX() - Camera.getX() + maskX, this.getY() + maskY - Camera.getY(), maskWidth, maskHeight);
     }

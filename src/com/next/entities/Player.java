@@ -38,10 +38,13 @@ public class Player extends Entity implements KeyListener {
     private BufferedImage[] leftPlayer;
     private BufferedImage[] rightPlayer;
 
+    private int life;
+
     public Player(int x, int y, int width, int height, BufferedImage sprite) {
         super(x, y, width, height, sprite);
         this.speed = 2;
         this.moved = false;
+        this.life = 100;
 
         this.maxFrames = 15;
         this.maxIndex = 1;
@@ -166,6 +169,22 @@ public class Player extends Entity implements KeyListener {
             setRight(false);
         }
 
+    }
+
+    public int getLife() {
+        return life;
+    }
+
+    public void setLife(int life) {
+        this.life = life;
+    }
+    
+    public void dealDamage(int dmg) {
+        this.life -= dmg;
+    }
+    
+    public boolean isDead() {
+        return life == 0 ? true: false;
     }
 
 }
