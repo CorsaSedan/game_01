@@ -16,11 +16,6 @@ public class Enemy extends Entity {
 
     private int speed = 1;
 
-    private int maskX;
-    private int maskY;
-    private int maskWidth;
-    private int maskHeight;
-
     private int frames = 0;
     private int maxFrames = 10;
     private int index = 0;
@@ -107,10 +102,7 @@ public class Enemy extends Entity {
     @Override
     public void render(Graphics g) {
         //super.render(g);
-        g.drawImage(sprites[index], getX() - Camera.getX(), getY() - Camera.getY(), null);
-
-        //g.setColor(Color.BLUE);
-        //g.fillRect(this.getX() - Camera.getX() + maskX, this.getY() + maskY - Camera.getY(), maskWidth, maskHeight);
+        g.drawImage(sprites[index], getX() - Camera.getX(), getY() - Camera.getY(), null);        
     }
 
 }

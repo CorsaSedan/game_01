@@ -4,6 +4,8 @@ import com.next.configs.TileMap;
 import com.next.entities.Enemy;
 import com.next.entities.Entity;
 import com.next.entities.Item;
+import com.next.entities.Life;
+import com.next.entities.SpellEssence;
 import com.next.main.Game;
 import com.next.view.Camera;
 import java.awt.Graphics;
@@ -47,17 +49,20 @@ public class World {
                         tiles[xx + (yy * WIDHT)] = new TileWall(TileMap.TILE_WALL, xx * 16, yy * 16);
                         break;
                     case 0xffc600ff: //Spell Essence
-                        Game.items.add(new Item(xx * 16, yy * 16, WIDHT, HEIGHT, Item.SPELL_ESSENCE));
+                        Item s = new SpellEssence(xx * 16, yy * 16, 16, 16, Item.SPELL_ESSENCE);
+                        Game.items.add(s);
                         tiles[xx + (yy * WIDHT)] = new TileFloor(TileMap.TILE_FLOR, xx * 16, yy * 16);
                         break;
                     case 0xffff0000: //Enemy
-                        Enemy en = new Enemy(xx * 16, yy * 16, WIDHT, HEIGHT, Entity.ENEMY);
+                        Enemy en = new Enemy(xx * 16, yy * 16, 16, 16, Entity.ENEMY);
                         Game.entities.add(en);
                         Game.enemies.add(en);
                         tiles[xx + (yy * WIDHT)] = new TileFloor(TileMap.TILE_FLOR, xx * 16, yy * 16);
                         break;
                     case 0xff00ff00: //Life
-                        Game.items.add(new Item(xx * 16, yy * 16, WIDHT, HEIGHT, Item.LIFEPACK));
+                        Item l = new Life(xx * 16, yy * 16, 16, 16, Item.LIFEPACK);
+                        l.setMask(2, 1, 12, 12);
+                        Game.items.add(l);
                         tiles[xx + (yy * WIDHT)] = new TileFloor(TileMap.TILE_FLOR, xx * 16, yy * 16);
                         break;
                     default:
@@ -101,14 +106,14 @@ public class World {
 
         try {
             return !(tiles[x1 + (y1 * World.WIDHT)] instanceof TileWall
-                || tiles[x2 + (y2 * World.WIDHT)] instanceof TileWall
-                || tiles[x3 + (y3 * World.WIDHT)] instanceof TileWall
-                || tiles[x4 + (y4 * World.WIDHT)] instanceof TileWall);
+                    || tiles[x2 + (y2 * World.WIDHT)] instanceof TileWall
+                    || tiles[x3 + (y3 * World.WIDHT)] instanceof TileWall
+                    || tiles[x4 + (y4 * World.WIDHT)] instanceof TileWall);
         } catch (ArrayIndexOutOfBoundsException ex) {
             Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
-        
+
     }
 
 }

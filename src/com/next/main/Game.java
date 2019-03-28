@@ -31,6 +31,7 @@ public class Game extends Canvas implements Runnable {
     public static int HEIGHT = 160;
     public static int SCALE = 3;
 
+    public UI ui;
     private BufferedImage image;
 
     public static Spritesheet spritesheet;
@@ -47,6 +48,7 @@ public class Game extends Canvas implements Runnable {
         super.setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
         initFrame();
 
+        ui = new UI();
         random = new Random();
         
         image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
@@ -100,9 +102,7 @@ public class Game extends Canvas implements Runnable {
     //Update
     private void tick() {
         //TODO code here
-        for (Entity entity : entities) {
-            entity.tick();
-        }
+        entities.forEach((Entity e) -> e.tick());
     }
 
     //Render
@@ -122,10 +122,13 @@ public class Game extends Canvas implements Runnable {
         for (Entity entity : entities) {
             entity.render(g);
         }
+
         for (Item item : items) {
             item.render(g);
         }
 
+        ui.render(g);
+        
         g.dispose();
         g = bs.getDrawGraphics();
         g.drawImage(image, 0, 0, WIDTH * SCALE, HEIGHT * SCALE, null);

@@ -13,6 +13,7 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
+import java.util.Iterator;
 
 /**
  *
@@ -38,13 +39,16 @@ public class Player extends Entity implements KeyListener {
     private BufferedImage[] leftPlayer;
     private BufferedImage[] rightPlayer;
 
-    private int life;
+    private double maxLife;
+    private double life;
 
     public Player(int x, int y, int width, int height, BufferedImage sprite) {
         super(x, y, width, height, sprite);
         this.speed = 2;
         this.moved = false;
-        this.life = 100;
+
+        this.maxLife = 100;
+        this.life = maxLife;
 
         this.maxFrames = 15;
         this.maxIndex = 1;
@@ -119,6 +123,8 @@ public class Player extends Entity implements KeyListener {
             }
         }
 
+        checkLifePackIsColliding();
+
         Camera.setX(Camera.clamp(this.getX() - (Game.WIDTH / 2), 0, World.WIDHT * 16 - Game.WIDTH));
         Camera.setY(Camera.clamp(this.getY() - (Game.HEIGHT / 2), 0, World.HEIGHT * 16 - Game.HEIGHT));
     }
@@ -138,13 +144,46 @@ public class Player extends Entity implements KeyListener {
         }
     }
 
+    public void checkLifePackIsColliding() {
+        
+        for (int i = 0; i < Game.items.size(); i++) {
+            Item actual = Game.items.get(i);
+            if (actual instanceof Life) {
+                if (this.isColliding(actual)) {
+                    this.heal(((Life) actual).getHeal());
+                    Game.items.remove(actual);
+                }
+            }
+        }
+
+//        Game.items.forEach((Item i) -> {
+//            if (i instanceof Life) {
+//                if (this.isColliding(i)) {
+//                    this.heal(((Life) i).getHeal());
+//                    Game.items.remove(Game.items.indexOf(i));
+//                }
+//            }
+//        });
+//        for (Item item : Game.items) {
+//            PrimitiveEntity actual = item;
+//            if (actual instanceof Life) {
+//                if (this.isColliding(actual)) {
+//                    this.heal(((Life)actual).getHeal());
+//                    Game.items.remove(actual);
+//                }
+//            }
+//        }
+    }
+
     @Override
-    public void keyTyped(KeyEvent e) {
+    public void keyTyped(KeyEvent e
+    ) {
 
     }
 
     @Override
-    public void keyPressed(KeyEvent e) {
+    public void keyPressed(KeyEvent e
+    ) {
         if (e.getKeyCode() == KeyboardConfig.MOVE_UP) {
             setUp(true);
         } else if (e.getKeyCode() == KeyboardConfig.MOVE_DOWN) {
@@ -157,7 +196,8 @@ public class Player extends Entity implements KeyListener {
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {
+    public void keyReleased(KeyEvent e
+    ) {
 
         if (e.getKeyCode() == KeyboardConfig.MOVE_UP) {
             setUp(false);
@@ -171,20 +211,36 @@ public class Player extends Entity implements KeyListener {
 
     }
 
-    public int getLife() {
+    public void heal(double life) {
+        if (this.getLife() + life > maxLife) {
+            this.life = maxLife;
+        } else {
+            this.life += life;
+        }
+    }
+
+    public double getLife() {
         return life;
     }
 
-    public void setLife(int life) {
+    public void setLife(double life) {
         this.life = life;
     }
-    
+
+    public double getMaxLife() {
+        return maxLife;
+    }
+
+    public void setMaxLife(double maxLife) {
+        this.maxLife = maxLife;
+    }
+
     public void dealDamage(int dmg) {
         this.life -= dmg;
     }
-    
+
     public boolean isDead() {
-        return life == 0 ? true: false;
+        return life == 0 ? true : false;
     }
 
 }
