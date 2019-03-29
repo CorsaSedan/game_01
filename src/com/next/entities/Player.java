@@ -42,6 +42,8 @@ public class Player extends Entity implements KeyListener {
     private double maxLife;
     private double life;
 
+    private int spell;
+
     public Player(int x, int y, int width, int height, BufferedImage sprite) {
         super(x, y, width, height, sprite);
         this.speed = 2;
@@ -124,6 +126,7 @@ public class Player extends Entity implements KeyListener {
         }
 
         checkLifePackIsColliding();
+        chekSpellEssenceIsColliding();
 
         Camera.setX(Camera.clamp(this.getX() - (Game.WIDTH / 2), 0, World.WIDHT * 16 - Game.WIDTH));
         Camera.setY(Camera.clamp(this.getY() - (Game.HEIGHT / 2), 0, World.HEIGHT * 16 - Game.HEIGHT));
@@ -144,14 +147,26 @@ public class Player extends Entity implements KeyListener {
         }
     }
 
+    public void chekSpellEssenceIsColliding() {
+        for (Iterator<Item> iterator = Game.items.iterator(); iterator.hasNext();) {
+            Item actual = iterator.next();
+            if (actual instanceof SpellEssence) {
+                if (this.isColliding(actual)) {
+                    this.spell += ((SpellEssence) actual).getEssence();
+                    iterator.remove();
+                }
+            }
+        }
+    }
+
     public void checkLifePackIsColliding() {
-        
-        for (int i = 0; i < Game.items.size(); i++) {
-            Item actual = Game.items.get(i);
+
+        for (Iterator<Item> iterator = Game.items.iterator(); iterator.hasNext();) {
+            Item actual = iterator.next();
             if (actual instanceof Life) {
                 if (this.isColliding(actual)) {
                     this.heal(((Life) actual).getHeal());
-                    Game.items.remove(actual);
+                    iterator.remove();
                 }
             }
         }
@@ -164,15 +179,6 @@ public class Player extends Entity implements KeyListener {
 //                }
 //            }
 //        });
-//        for (Item item : Game.items) {
-//            PrimitiveEntity actual = item;
-//            if (actual instanceof Life) {
-//                if (this.isColliding(actual)) {
-//                    this.heal(((Life)actual).getHeal());
-//                    Game.items.remove(actual);
-//                }
-//            }
-//        }
     }
 
     @Override
@@ -235,12 +241,20 @@ public class Player extends Entity implements KeyListener {
         this.maxLife = maxLife;
     }
 
+    public int getSpell() {
+        return spell;
+    }
+
+    public void setSpell(int s) {
+        this.spell = s;
+    }
+
     public void dealDamage(int dmg) {
         this.life -= dmg;
     }
 
     public boolean isDead() {
-        return life == 0 ? true : false;
+        return life == 0;
     }
 
 }

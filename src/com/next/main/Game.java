@@ -9,6 +9,7 @@ import com.next.world.World;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
@@ -132,6 +133,8 @@ public class Game extends Canvas implements Runnable {
         g.dispose();
         g = bs.getDrawGraphics();
         g.drawImage(image, 0, 0, WIDTH * SCALE, HEIGHT * SCALE, null);
+//        g.setFont(new Font("Arial", Font.BOLD, 17));
+//        g.drawString("Magia - " + player.getSpell(), 10, 10);
         bs.show();
     }
 

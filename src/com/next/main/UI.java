@@ -21,5 +21,7 @@ public class UI {
         g.fillRect(12, 7, (int)((Game.player.getLife()/Game.player.getMaxLife())*100), 10);
         g.setColor(Color.WHITE);
         g.drawString((int)Game.player.getLife() + "/" + (int)Game.player.getMaxLife(), 16, 16);
+        g.setColor(Color.MAGENTA);
+        g.drawString("Magia: " + Game.player.getSpell(), 16, 27);
     }
 }
