@@ -11,6 +11,7 @@ import com.next.view.Camera;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -74,8 +75,8 @@ public class World {
     }
 
     public void render(Graphics g) {
-        int xstart = Camera.getX() >> 4;    // Dividido por 16
-        int ystart = Camera.getY() >> 4;    // Dividido por 16
+        int xstart = Camera.x >> 4;    // Dividido por 16
+        int ystart = Camera.y >> 4;    // Dividido por 16
 
         int xfinal = xstart + (Game.WIDTH >> 4);    //Dividido por 16
         int yfinal = ystart + (Game.HEIGHT >> 4);   //Dividido por 16
@@ -114,6 +115,15 @@ public class World {
             return false;
         }
 
+    }
+    
+    public void restartWorld(String level) throws IOException {
+        Game.entities.clear();
+        Game.enemies.clear();
+        Game.entities = new ArrayList();
+        Game.enemies = new ArrayList();
+        Game.entities.add(Game.player);
+        Game.world = new World(level);
     }
 
 }

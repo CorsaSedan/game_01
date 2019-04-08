@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.Iterator;
 
 /**
  *
@@ -21,7 +22,12 @@ public class Enemy extends Entity {
     private int index = 0;
     private int maxIndex = 1;
 
+    private int life;
+    private boolean isDamaged;
+
     private BufferedImage[] sprites;
+    private BufferedImage dmgSprite;
+    private BufferedImage die;
 
     public Enemy(int x, int y, int width, int height, BufferedImage sprite) {
         super(x, y, width, height, sprite);
@@ -35,10 +41,19 @@ public class Enemy extends Entity {
 
         sprites[0] = Game.spritesheet.getSprite(96, 16, 16, 16);
         sprites[1] = Game.spritesheet.getSprite(112, 16, 16, 16);
+
+        dmgSprite = Game.spritesheet.getSprite(48, 32, 16, 16);
+        die = Game.spritesheet.getSprite(64, 32, 16, 16);
+
+        life = 10;
     }
 
     @Override
     public void tick() {
+
+        if (isDamaged) {
+            isDamaged = false;
+        }
 
         if (!this.isCollidingWithPlayer()) {
             if (this.getX() < Game.player.getX() && World.isFree(this.getX() + speed, this.getY())
@@ -59,8 +74,9 @@ public class Enemy extends Entity {
         } else {
             if (Game.random.nextInt(100) < 10) {
                 Game.player.dealDamage(1);
+                Game.player.setIsDamaged(true);
             }
-            
+
             if (Game.player.isDead()) {
                 //System.exit(0);
             }
@@ -72,6 +88,24 @@ public class Enemy extends Entity {
             index++;
             if (index > maxIndex) {
                 index = 0;
+            }
+        }
+
+        checkCollisionWithSpell();
+    }
+
+    public void checkCollisionWithSpell() {
+        for (Iterator<SpellShoot> iterator = Game.spellShoot.iterator(); iterator.hasNext();) {
+            SpellShoot next = iterator.next();
+
+            if (this.isColliding(next)) {
+                this.isDamaged = true;
+                next.selfDestroy();
+                life -= 5;
+            }
+
+            if (life <= 0) {
+                selfDestroy();
             }
         }
     }
@@ -102,7 +136,11 @@ public class Enemy extends Entity {
     @Override
     public void render(Graphics g) {
         //super.render(g);
-        g.drawImage(sprites[index], getX() - Camera.getX(), getY() - Camera.getY(), null);        
+        if (isDamaged) {
+            g.drawImage(dmgSprite, getX() - Camera.x, getY() - Camera.y, null);
+            return;
+        }
+        g.drawImage(sprites[index], getX() - Camera.x, getY() - Camera.y, null);
     }
 
 }

@@ -4,6 +4,7 @@ import com.next.entities.Enemy;
 import com.next.entities.Entity;
 import com.next.entities.Item;
 import com.next.entities.Player;
+import com.next.entities.SpellShoot;
 import com.next.graphics.Spritesheet;
 import com.next.world.World;
 import java.awt.Canvas;
@@ -15,6 +16,7 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -37,13 +39,17 @@ public class Game extends Canvas implements Runnable {
 
     public static Spritesheet spritesheet;
     public static World world;
-    
+
     public static Random random;
 
     public static List<Entity> entities;
     public static List<Enemy> enemies;
     public static List<Item> items;
     public static Player player;
+    public static List<SpellShoot> spellShoot;
+
+    private int CUR_LEVEL;
+    private int MAX_LEVEL;
 
     public Game() {
         super.setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
@@ -51,11 +57,15 @@ public class Game extends Canvas implements Runnable {
 
         ui = new UI();
         random = new Random();
-        
+
         image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
         entities = new ArrayList();
         enemies = new ArrayList();
         items = new ArrayList();
+        spellShoot = new ArrayList();
+        
+        CUR_LEVEL = 1;
+        MAX_LEVEL = 2;
         try {
             spritesheet = new Spritesheet("/spritesheet.png");
 
@@ -63,7 +73,7 @@ public class Game extends Canvas implements Runnable {
             addKeyListener(player);
             entities.add(player);
 
-            world = new World("/map.png");
+            world = new World("/level1.png");
         } catch (IOException ex) {
             Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -103,7 +113,14 @@ public class Game extends Canvas implements Runnable {
     //Update
     private void tick() {
         //TODO code here
-        entities.forEach((Entity e) -> e.tick());
+        //entities.forEach((Entity e) -> e.tick());
+
+        for (Iterator<Entity> iterator = entities.iterator(); iterator.hasNext();) {
+            Entity next = iterator.next();
+            next.tick();
+        }
+
+        spellShoot.forEach((SpellShoot s) -> s.tick());
     }
 
     //Render
@@ -120,16 +137,45 @@ public class Game extends Canvas implements Runnable {
         g.fillRect(0, 0, WIDTH, HEIGHT);
 
         world.render(g);
-        for (Entity entity : entities) {
-            entity.render(g);
+//        for (Entity entity : entities) {
+//            entity.render(g);
+//        }
+        for (Iterator<Entity> iterator = entities.iterator(); iterator.hasNext();) {
+            Entity next = iterator.next();
+
+            next.render(g);
+
+            if (next.getSelfDestroy()) {
+                iterator.remove();
+
+                if (next instanceof Enemy) {
+                    Game.enemies.remove(next);
+                    if (Game.enemies.isEmpty()) {
+                        nextLevel();
+                        return;
+                    }
+                }
+                continue;
+            }
         }
 
         for (Item item : items) {
             item.render(g);
         }
 
+        for (Iterator<SpellShoot> iterator = spellShoot.iterator(); iterator.hasNext();) {
+            SpellShoot next = iterator.next();
+
+            next.render(g);
+
+            if (next.getSelfDestroy()) {
+                iterator.remove();
+                continue;
+            }
+        }
+
         ui.render(g);
-        
+
         g.dispose();
         g = bs.getDrawGraphics();
         g.drawImage(image, 0, 0, WIDTH * SCALE, HEIGHT * SCALE, null);
@@ -172,9 +218,29 @@ public class Game extends Canvas implements Runnable {
 
         stop();
     }
+    
+    private boolean hasNextLevel() {
+        return CUR_LEVEL < MAX_LEVEL;
+    }
 
     public static void main(String[] args) {
         new Game().start();
+    }
+
+    private void nextLevel() {
+        System.out.println("PROXIMO NÍVEL!!!!!!!");
+        if (hasNextLevel()) {
+            CUR_LEVEL++;
+        } else {
+            CUR_LEVEL = 1;
+        }
+        
+        String nextLevel = "/level" + CUR_LEVEL + ".png";
+        try {
+            world.restartWorld(nextLevel);
+        } catch (IOException ex) {
+            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

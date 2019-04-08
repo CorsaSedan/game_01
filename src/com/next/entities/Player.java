@@ -39,10 +39,19 @@ public class Player extends Entity implements KeyListener {
     private BufferedImage[] leftPlayer;
     private BufferedImage[] rightPlayer;
 
+    private BufferedImage dmgPlayerUp;
+    private BufferedImage dmgPlayerDown;
+    private BufferedImage dmgPlayerLeft;
+    private BufferedImage dmgPlayerRight;
+
     private double maxLife;
     private double life;
 
     private int spell;
+    private int maxSpell;
+
+    private boolean isDamaged;
+    private boolean shoot;
 
     public Player(int x, int y, int width, int height, BufferedImage sprite) {
         super(x, y, width, height, sprite);
@@ -52,8 +61,14 @@ public class Player extends Entity implements KeyListener {
         this.maxLife = 100;
         this.life = maxLife;
 
+        this.spell = 15;
+        this.maxSpell = 100;
+
         this.maxFrames = 15;
         this.maxIndex = 1;
+
+        this.isDamaged = false;
+        this.shoot = false;
 
         upPlayer = new BufferedImage[2];
         downPlayer = new BufferedImage[2];
@@ -75,6 +90,11 @@ public class Player extends Entity implements KeyListener {
         //leftPlayer[0] = Game.spritesheet.getSprite(16, 16, width, height);
         leftPlayer[0] = Game.spritesheet.getSprite(32, 16, width, height);
         leftPlayer[1] = Game.spritesheet.getSprite(48, 16, width, height);
+
+        dmgPlayerDown = Game.spritesheet.getSprite(128, 16, width, height);
+        dmgPlayerUp = Game.spritesheet.getSprite(16, 32, width, height);
+        dmgPlayerRight = Game.spritesheet.getSprite(144, 16, width, height);
+        dmgPlayerLeft = Game.spritesheet.getSprite(0, 32, width, height);
     }
 
     public void setRight(boolean right) {
@@ -125,34 +145,83 @@ public class Player extends Entity implements KeyListener {
             }
         }
 
+        if (shoot) {
+            shoot = false;
+            if (spell > 0) {
+                this.shoot();
+            }
+        }
+
         checkLifePackIsColliding();
         chekSpellEssenceIsColliding();
 
-        Camera.setX(Camera.clamp(this.getX() - (Game.WIDTH / 2), 0, World.WIDHT * 16 - Game.WIDTH));
-        Camera.setY(Camera.clamp(this.getY() - (Game.HEIGHT / 2), 0, World.HEIGHT * 16 - Game.HEIGHT));
+        Camera.x = (Camera.clamp(this.getX() - (Game.WIDTH / 2), 0, World.WIDHT * 16 - Game.WIDTH));
+        Camera.y = (Camera.clamp(this.getY() - (Game.HEIGHT / 2), 0, World.HEIGHT * 16 - Game.HEIGHT));
     }
 
     @Override
     public void render(Graphics g) {
+
+        if (isDamaged) {
+            if (up) {
+                g.drawImage(dmgPlayerUp, getX() - Camera.x, getY() - Camera.y, null);
+            } else if (down) {
+                g.drawImage(dmgPlayerDown, getX() - Camera.x, getY() - Camera.y, null);
+            } else if (right) {
+                g.drawImage(dmgPlayerRight, getX() - Camera.x, getY() - Camera.y, null);
+            } else if (left) {
+                g.drawImage(dmgPlayerLeft, getX() - Camera.x, getY() - Camera.y, null);
+            } else {
+                g.drawImage(dmgPlayerDown, getX() - Camera.x, getY() - Camera.y, null);
+            }
+            isDamaged = false;
+            return;
+        }
+
         if (up) {
-            g.drawImage(upPlayer[index], getX() - Camera.getX(), getY() - Camera.getY(), null);
+            g.drawImage(upPlayer[index], getX() - Camera.x, getY() - Camera.y, null);
         } else if (down) {
-            g.drawImage(downPlayer[index], getX() - Camera.getX(), getY() - Camera.getY(), null);
+            g.drawImage(downPlayer[index], getX() - Camera.x, getY() - Camera.y, null);
         } else if (right) {
-            g.drawImage(rightPlayer[index], getX() - Camera.getX(), getY() - Camera.getY(), null);
+            g.drawImage(rightPlayer[index], getX() - Camera.x, getY() - Camera.y, null);
         } else if (left) {
-            g.drawImage(leftPlayer[index], getX() - Camera.getX(), getY() - Camera.getY(), null);
+            g.drawImage(leftPlayer[index], getX() - Camera.x, getY() - Camera.y, null);
         } else {
             super.render(g);
         }
     }
 
+    private void shoot() {
+        int dx = 0;
+        int dy = 0;
+
+        if (up) {
+            dy = -1;
+        } else if (down) {
+            dy = 1;
+        } else if (right) {
+            dx = 1;
+        } else if (left) {
+            dx = -1;
+        } else {
+            dy = 1;
+        }
+
+        spell--;
+
+        SpellShoot e = new SpellShoot(this.getX(), this.getY(), this.getWidth(), this.getHeight(), Game.spritesheet.getSprite(32, 32, this.getWidth(), this.getHeight()), dx, dy);
+        Game.spellShoot.add(e);
+    }
+
     public void chekSpellEssenceIsColliding() {
+        if (spell == maxSpell) {
+            return;
+        }
         for (Iterator<Item> iterator = Game.items.iterator(); iterator.hasNext();) {
             Item actual = iterator.next();
             if (actual instanceof SpellEssence) {
                 if (this.isColliding(actual)) {
-                    this.spell += ((SpellEssence) actual).getEssence();
+                    increaseSpell(((SpellEssence) actual).getEssence());
                     iterator.remove();
                 }
             }
@@ -182,14 +251,12 @@ public class Player extends Entity implements KeyListener {
     }
 
     @Override
-    public void keyTyped(KeyEvent e
-    ) {
+    public void keyTyped(KeyEvent e) {
 
     }
 
     @Override
-    public void keyPressed(KeyEvent e
-    ) {
+    public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyboardConfig.MOVE_UP) {
             setUp(true);
         } else if (e.getKeyCode() == KeyboardConfig.MOVE_DOWN) {
@@ -199,11 +266,14 @@ public class Player extends Entity implements KeyListener {
         } else if (e.getKeyCode() == KeyboardConfig.MOVE_RIGHT) {
             setRight(true);
         }
+
+        if (e.getKeyCode() == KeyboardConfig.SPELL_SHOOT) {
+            this.shoot = true;
+        }
     }
 
     @Override
-    public void keyReleased(KeyEvent e
-    ) {
+    public void keyReleased(KeyEvent e) {
 
         if (e.getKeyCode() == KeyboardConfig.MOVE_UP) {
             setUp(false);
@@ -225,12 +295,20 @@ public class Player extends Entity implements KeyListener {
         }
     }
 
+    public void increaseSpell(int spell) {
+        if (this.spell + spell > maxSpell) {
+            this.spell = maxSpell;
+        } else {
+            this.spell += spell;
+        }
+    }
+
     public double getLife() {
         return life;
     }
 
-    public void setLife(double life) {
-        this.life = life;
+    public int getMaxSpell() {
+        return maxSpell;
     }
 
     public double getMaxLife() {
@@ -247,6 +325,18 @@ public class Player extends Entity implements KeyListener {
 
     public void setSpell(int s) {
         this.spell = s;
+    }
+
+    public boolean isShoot() {
+        return shoot;
+    }
+
+    public void setShoot(boolean shoot) {
+        this.shoot = shoot;
+    }
+
+    public void setIsDamaged(boolean isDamaged) {
+        this.isDamaged = isDamaged;
     }
 
     public void dealDamage(int dmg) {

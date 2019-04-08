@@ -24,6 +24,6 @@ public abstract class Tile{
     
     
     public void render(Graphics g) {
-        g.drawImage(sprite, x - Camera.getX(), y - Camera.getY(), null);
+        g.drawImage(sprite, x - Camera.x, y - Camera.y, null);
     }
 }

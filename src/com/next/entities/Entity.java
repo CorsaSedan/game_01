@@ -18,7 +18,7 @@ public abstract class Entity extends PrimitiveEntity{
     public static BufferedImage ENEMY = Game.spritesheet.getSprite(6 * 16, 16, 16, 16);
 
     public Entity(int x, int y, int width, int height, BufferedImage sprite) {
-        super(x - Camera.getX(), y - Camera.getY(), width, height, sprite);
+        super(x - Camera.x, y - Camera.y, width, height, sprite);
     }
 
     public abstract void tick();

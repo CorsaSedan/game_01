@@ -23,6 +23,8 @@ public abstract class PrimitiveEntity {
     protected int maskHeight;
 
     private BufferedImage sprite;
+    
+    private boolean selfDestroy;
 
     public PrimitiveEntity(int x, int y, int width, int height, BufferedImage sprite) {
         this.x = x;
@@ -84,11 +86,19 @@ public abstract class PrimitiveEntity {
     }
 
     public void render(Graphics g) {
-        g.drawImage(sprite, this.getX() - Camera.getX(), this.getY() - Camera.getY(), null);
+        g.drawImage(sprite, this.getX() - Camera.x, this.getY() - Camera.y, null);
 
         //Show mask
         //g.setColor(Color.BLUE);
         //g.fillRect(this.getX() + maskX - Camera.getX(), this.getY() + maskY - Camera.getY(), maskWidth, maskHeight);
+    }
+    
+    public void selfDestroy() {
+        selfDestroy = true;
+    }
+    
+    public boolean getSelfDestroy() {
+        return selfDestroy;
     }
 
 }
