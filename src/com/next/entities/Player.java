@@ -119,6 +119,12 @@ public class Player extends Entity implements KeyListener {
 
     @Override
     public void tick() {
+        
+        if (isDead()) {
+            Game.state = "GAME_OVER";
+            return;
+        }
+        
         moved = false;
         if (right && World.isFree(getX() + speed, getY())) {
             moved = true;
@@ -161,7 +167,11 @@ public class Player extends Entity implements KeyListener {
 
     @Override
     public void render(Graphics g) {
-
+        
+        if (isDead()) {
+            return;
+        }
+        
         if (isDamaged) {
             if (up) {
                 g.drawImage(dmgPlayerUp, getX() - Camera.x, getY() - Camera.y, null);
@@ -344,7 +354,7 @@ public class Player extends Entity implements KeyListener {
     }
 
     public boolean isDead() {
-        return life == 0;
+        return life <= 0;
     }
 
 }

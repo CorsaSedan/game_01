@@ -118,12 +118,11 @@ public class Enemy extends Entity {
     }
 
     public boolean isColliding(int xnext, int ynext) {
-
-        Rectangle curr = new Rectangle(xnext + maskX, ynext + maskY, maskWidth, maskHeight);
         for (Enemy enemy : Game.enemies) {
             if (enemy == this) {
                 continue;
             }
+            Rectangle curr = new Rectangle(xnext + maskX, ynext + maskY, maskWidth, maskHeight);
             Rectangle target = new Rectangle(enemy.getX() + maskX, enemy.getY() + maskY, maskWidth, maskHeight);
             if (curr.intersects(target)) {
                 return true;

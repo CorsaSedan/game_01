@@ -12,6 +12,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -28,6 +29,8 @@ public class Game extends Canvas implements Runnable {
     private Thread thread;
     private boolean isRunning;
 
+    public static String state;
+    
     private JFrame frame;
     public final String name = "Game Project";
     public static int WIDTH = 240;
@@ -54,6 +57,8 @@ public class Game extends Canvas implements Runnable {
     public Game() {
         super.setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
         initFrame();
+        
+        state = "NORMAL";
 
         ui = new UI();
         random = new Random();
@@ -115,6 +120,11 @@ public class Game extends Canvas implements Runnable {
         //TODO code here
         //entities.forEach((Entity e) -> e.tick());
 
+        if (state.equals("GAME_OVER")) {
+            //Game Over
+            return;
+        }
+        
         for (Iterator<Entity> iterator = entities.iterator(); iterator.hasNext();) {
             Entity next = iterator.next();
             next.tick();
@@ -150,12 +160,11 @@ public class Game extends Canvas implements Runnable {
 
                 if (next instanceof Enemy) {
                     Game.enemies.remove(next);
-                    if (Game.enemies.isEmpty()) {
+                    /*if (Game.enemies.isEmpty()) {
                         nextLevel();
                         return;
-                    }
+                    }*/
                 }
-                continue;
             }
         }
 
@@ -181,6 +190,15 @@ public class Game extends Canvas implements Runnable {
         g.drawImage(image, 0, 0, WIDTH * SCALE, HEIGHT * SCALE, null);
 //        g.setFont(new Font("Arial", Font.BOLD, 17));
 //        g.drawString("Magia - " + player.getSpell(), 10, 10);
+        if (state.equals("GAME_OVER")) {
+            Graphics2D  g2 = (Graphics2D) g;
+            g2.setColor(new Color(0, 0, 0, 100));
+            g2.fillRect(0, 0, WIDTH*SCALE, HEIGHT*SCALE);
+            g.setFont(new Font("arial", Font.BOLD, 60));
+            g.setColor(Color.WHITE);
+            g.drawString("Game Over", (WIDTH*SCALE) / 2 - 150, (WIDTH*SCALE) / 2 - 150);
+        }
+
         bs.show();
     }
 
