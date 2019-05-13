@@ -13,6 +13,7 @@ public final class KeyboardConfig {
     public static int MOVE_LEFT = KeyEvent.VK_A;
     public static int MOVE_RIGHT = KeyEvent.VK_D;
     public static int SPELL_SHOOT = KeyEvent.VK_L;
+    public static int RESTART_GAME_OVER = KeyEvent.VK_ENTER;
 
     public static void setMOVE_UP(int MOVE_UP) {
         KeyboardConfig.MOVE_UP = MOVE_UP;

@@ -1,5 +1,6 @@
 package com.next.main;
 
+import com.next.configs.KeyboardConfig;
 import com.next.entities.Enemy;
 import com.next.entities.Entity;
 import com.next.entities.Item;
@@ -13,6 +14,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -24,13 +27,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 
-public class Game extends Canvas implements Runnable {
+public class Game extends Canvas implements Runnable, KeyListener {
 
     private Thread thread;
     private boolean isRunning;
 
     public static String state;
-    
+    private boolean restartGame;
+
     private JFrame frame;
     public final String name = "Game Project";
     public static int WIDTH = 240;
@@ -42,6 +46,7 @@ public class Game extends Canvas implements Runnable {
 
     public static Spritesheet spritesheet;
     public static World world;
+    public static Menu menu;
 
     public static Random random;
 
@@ -57,18 +62,23 @@ public class Game extends Canvas implements Runnable {
     public Game() {
         super.setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
         initFrame();
-        
+
+        addKeyListener(this);
+
+        //state = "MENU";
         state = "NORMAL";
+        restartGame = false;
 
         ui = new UI();
         random = new Random();
 
+        menu = new Menu();
         image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
         entities = new ArrayList();
         enemies = new ArrayList();
         items = new ArrayList();
         spellShoot = new ArrayList();
-        
+
         CUR_LEVEL = 1;
         MAX_LEVEL = 2;
         try {
@@ -119,18 +129,37 @@ public class Game extends Canvas implements Runnable {
     private void tick() {
         //TODO code here
         //entities.forEach((Entity e) -> e.tick());
+        
+        if (state.equals("MENU")) {
+            menu.tick();
+        }
 
         if (state.equals("GAME_OVER")) {
+            if (restartGame) {
+                state = "NORMAL";
+                player.heal(100);
+
+                String nextLevel = "/level" + CUR_LEVEL + ".png";
+                try {
+                    world.restartWorld(nextLevel);
+                } catch (IOException ex) {
+                    Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                restartGame = false;
+            }
+
             //Game Over
             return;
         }
-        
-        for (Iterator<Entity> iterator = entities.iterator(); iterator.hasNext();) {
-            Entity next = iterator.next();
-            next.tick();
-        }
 
-        spellShoot.forEach((SpellShoot s) -> s.tick());
+        if (state.equals("NORMAL")) {
+            for (Iterator<Entity> iterator = entities.iterator(); iterator.hasNext();) {
+                Entity next = iterator.next();
+                next.tick();
+            }
+
+            spellShoot.forEach((SpellShoot s) -> s.tick());
+        }
     }
 
     //Render
@@ -191,12 +220,14 @@ public class Game extends Canvas implements Runnable {
 //        g.setFont(new Font("Arial", Font.BOLD, 17));
 //        g.drawString("Magia - " + player.getSpell(), 10, 10);
         if (state.equals("GAME_OVER")) {
-            Graphics2D  g2 = (Graphics2D) g;
+            Graphics2D g2 = (Graphics2D) g;
             g2.setColor(new Color(0, 0, 0, 100));
-            g2.fillRect(0, 0, WIDTH*SCALE, HEIGHT*SCALE);
+            g2.fillRect(0, 0, WIDTH * SCALE, HEIGHT * SCALE);
             g.setFont(new Font("arial", Font.BOLD, 60));
             g.setColor(Color.WHITE);
-            g.drawString("Game Over", (WIDTH*SCALE) / 2 - 150, (WIDTH*SCALE) / 2 - 150);
+            g.drawString("Game Over", (WIDTH * SCALE) / 2 - 150, (WIDTH * SCALE) / 2 - 150);
+        } else if (state.equals("MENU")) {
+            menu.render(g);
         }
 
         bs.show();
@@ -236,7 +267,7 @@ public class Game extends Canvas implements Runnable {
 
         stop();
     }
-    
+
     private boolean hasNextLevel() {
         return CUR_LEVEL < MAX_LEVEL;
     }
@@ -252,13 +283,32 @@ public class Game extends Canvas implements Runnable {
         } else {
             CUR_LEVEL = 1;
         }
-        
+
         String nextLevel = "/level" + CUR_LEVEL + ".png";
         try {
             world.restartWorld(nextLevel);
         } catch (IOException ex) {
             Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyboardConfig.RESTART_GAME_OVER) {
+            if (state.equals("GAME_OVER")) {
+                this.restartGame = true;
+            }
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+
     }
 
 }
